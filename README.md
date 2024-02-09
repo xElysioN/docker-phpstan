@@ -30,3 +30,9 @@ Refer to PHPStan documentation https://phpstan.org/user-guide/docker#install-php
 # Description
 
 Based on PHPStan image [1-php8.3](https://github.com/phpstan/phpstan/pkgs/container/phpstan/170527832?tag=1-php8.3) with [Symfony](https://github.com/phpstan/phpstan-symfony), [Doctrine](https://github.com/phpstan/phpstan-doctrine) & [PHPUnit](https://github.com/phpstan/phpstan-phpunit) extension.
+
+| Extension        | Version |
+|------------------|---------|
+| phpstan-symfony  | 1.3.7   |
+| phpstan-doctrine | 1.3.61  |
+| phpstan-phpunit  | 1.3.15  |

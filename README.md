@@ -34,5 +34,5 @@ Based on PHPStan image [1-php8.3](https://github.com/phpstan/phpstan/pkgs/contai
 | Extension        | Version |
 |------------------|---------|
 | phpstan-symfony  | 1.3.7   |
-| phpstan-doctrine | 1.3.61  |
-| phpstan-phpunit  | 1.3.15  |
+| phpstan-doctrine | 1.3.62  |
+| phpstan-phpunit  | 1.3.16  |

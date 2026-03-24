@@ -1,0 +1,86 @@
+name: Update dependencies
+
+on:
+    schedule:
+        -   cron: '0 8 * * *'
+    workflow_dispatch:
+
+jobs:
+    update:
+        name: Check and update PHPStan versions
+        permissions:
+            contents: write
+            pull-requests: write
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+                with:
+                    fetch-depth: 0
+
+            -   name: Read current versions from Dockerfile
+                id: current
+                run: |
+                    echo "phpstan=$(grep -m1 '^ARG PHPSTAN_VERSION=' Dockerfile | cut -d= -f2)" >> $GITHUB_OUTPUT
+                    echo "symfony=$(grep 'ARG PHPSTAN_SYMFONY_VERSION=' Dockerfile | cut -d= -f2)" >> $GITHUB_OUTPUT
+                    echo "doctrine=$(grep 'ARG PHPSTAN_DOCTRINE_VERSION=' Dockerfile | cut -d= -f2)" >> $GITHUB_OUTPUT
+                    echo "phpunit=$(grep 'ARG PHPSTAN_PHPUNIT_VERSION=' Dockerfile | cut -d= -f2)" >> $GITHUB_OUTPUT
+
+            -   name: Fetch latest versions from GitHub
+                id: latest
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    get_version() {
+                        gh api "repos/phpstan/$1/releases/latest" --jq '.tag_name | ltrimstr("v")'
+                    }
+                    echo "phpstan=$(get_version phpstan)" >> $GITHUB_OUTPUT
+                    echo "symfony=$(get_version phpstan-symfony)" >> $GITHUB_OUTPUT
+                    echo "doctrine=$(get_version phpstan-doctrine)" >> $GITHUB_OUTPUT
+                    echo "phpunit=$(get_version phpstan-phpunit)" >> $GITHUB_OUTPUT
+
+            -   name: Check for updates
+                id: check
+                run: |
+                    UPDATED=false
+                    [ "${{ steps.current.outputs.phpstan }}" != "${{ steps.latest.outputs.phpstan }}" ] && UPDATED=true
+                    [ "${{ steps.current.outputs.symfony }}" != "${{ steps.latest.outputs.symfony }}" ] && UPDATED=true
+                    [ "${{ steps.current.outputs.doctrine }}" != "${{ steps.latest.outputs.doctrine }}" ] && UPDATED=true
+                    [ "${{ steps.current.outputs.phpunit }}" != "${{ steps.latest.outputs.phpunit }}" ] && UPDATED=true
+                    echo "needed=$UPDATED" >> $GITHUB_OUTPUT
+
+            -   name: Update Dockerfile
+                if: steps.check.outputs.needed == 'true'
+                run: |
+                    PHPSTAN="${{ steps.latest.outputs.phpstan }}"
+                    sed -i "s|^ARG PHPSTAN_VERSION=.*|ARG PHPSTAN_VERSION=${PHPSTAN}|g" Dockerfile
+                    sed -i "s|ARG PHPSTAN_SYMFONY_VERSION=.*|ARG PHPSTAN_SYMFONY_VERSION=${{ steps.latest.outputs.symfony }}|" Dockerfile
+                    sed -i "s|ARG PHPSTAN_DOCTRINE_VERSION=.*|ARG PHPSTAN_DOCTRINE_VERSION=${{ steps.latest.outputs.doctrine }}|" Dockerfile
+                    sed -i "s|ARG PHPSTAN_PHPUNIT_VERSION=.*|ARG PHPSTAN_PHPUNIT_VERSION=${{ steps.latest.outputs.phpunit }}|" Dockerfile
+
+            -   name: Update README
+                if: steps.check.outputs.needed == 'true'
+                run: |
+                    sed -i "s/| PHPStan          | .* |/| PHPStan          | ${{ steps.latest.outputs.phpstan }} |/" README.md
+                    sed -i "s/| phpstan-symfony  | .* |/| phpstan-symfony  | ${{ steps.latest.outputs.symfony }} |/" README.md
+                    sed -i "s/| phpstan-doctrine | .* |/| phpstan-doctrine | ${{ steps.latest.outputs.doctrine }} |/" README.md
+                    sed -i "s/| phpstan-phpunit  | .* |/| phpstan-phpunit  | ${{ steps.latest.outputs.phpunit }} |/" README.md
+
+            -   name: Create pull request
+                if: steps.check.outputs.needed == 'true'
+                uses: peter-evans/create-pull-request@v6
+                with:
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    branch: chore/bump-phpstan-versions
+                    commit-message: |
+                        chore: bump PHPStan ${{ steps.current.outputs.phpstan }} → ${{ steps.latest.outputs.phpstan }} and extensions
+                    title: "chore: bump PHPStan ${{ steps.current.outputs.phpstan }} → ${{ steps.latest.outputs.phpstan }} and extensions"
+                    body: |
+                        ## Version updates
+
+                        | Package | Current | Latest |
+                        |---|---|---|
+                        | phpstan/phpstan | `${{ steps.current.outputs.phpstan }}` | `${{ steps.latest.outputs.phpstan }}` |
+                        | phpstan/phpstan-symfony | `${{ steps.current.outputs.symfony }}` | `${{ steps.latest.outputs.symfony }}` |
+                        | phpstan/phpstan-doctrine | `${{ steps.current.outputs.doctrine }}` | `${{ steps.latest.outputs.doctrine }}` |
+                        | phpstan/phpstan-phpunit | `${{ steps.current.outputs.phpunit }}` | `${{ steps.latest.outputs.phpunit }}` |

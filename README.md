@@ -1,38 +1,45 @@
-# PHPStan
+# docker-phpstan
 
-The Docker image is ready to use:
+Docker image based on [PHPStan](https://phpstan.org/) with the [Symfony](https://github.com/phpstan/phpstan-symfony), [Doctrine](https://github.com/phpstan/phpstan-doctrine) and [PHPUnit](https://github.com/phpstan/phpstan-phpunit) extensions pre-installed.
 
+The image tag matches the PHPStan version.
+
+## Usage
+
+```bash
+docker run --rm -v /path/to/app:/app ghcr.io/xelysion/docker-phpstan [arguments]
 ```
+
+Refer to the [PHPStan Docker documentation](https://phpstan.org/user-guide/docker#usage) for more details.
+
+## Pull
+
+```bash
+# Latest release
 docker pull ghcr.io/xelysion/docker-phpstan:latest
+
+# Specific PHPStan version
+docker pull ghcr.io/xelysion/docker-phpstan:2.1
 ```
 
-# Usage
+## Configuration
 
-```
-docker run --rm -v /path/to/app:/app ghcr.io/xelysion/docker-phpstan [some arguments for PHPStan]
-```
-Refer to PHPStan documentation https://phpstan.org/user-guide/docker#usage
+Enable the extensions in your `phpstan.neon`:
 
-# Configuration
-
-You can update the `phpstan.neon` file in order to use the extension:
-
-```
+```neon
 includes:
 	- /composer/vendor/phpstan/phpstan-symfony/extension.neon
 	- /composer/vendor/phpstan/phpstan-doctrine/extension.neon
 	- /composer/vendor/phpstan/phpstan-phpunit/extension.neon
 ```
 
-Refer to PHPStan documentation https://phpstan.org/user-guide/docker#install-phpstan-extensions
+Refer to the [PHPStan documentation](https://phpstan.org/user-guide/docker#install-phpstan-extensions) for more details.
 
+## Included versions
 
-# Description
-
-Based on PHPStan image [1-php8.3](https://github.com/phpstan/phpstan/pkgs/container/phpstan/170527832?tag=1-php8.3) with [Symfony](https://github.com/phpstan/phpstan-symfony), [Doctrine](https://github.com/phpstan/phpstan-doctrine) & [PHPUnit](https://github.com/phpstan/phpstan-phpunit) extension.
-
-| Extension        | Version |
+| Package          | Version |
 |------------------|---------|
-| phpstan-symfony  | 1.3.9   |
-| phpstan-doctrine | 1.3.65  |
-| phpstan-phpunit  | 1.3.16  |
+| PHPStan          | 2.1.43  |
+| phpstan-symfony  | 2.0.15  |
+| phpstan-doctrine | 2.0.20  |
+| phpstan-phpunit  | 2.0.16  |

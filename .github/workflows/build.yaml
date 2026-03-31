@@ -48,7 +48,7 @@ jobs:
                     provenance: false
                     context: .
                     push: true
-                    platforms: linux/amd64
+                    platforms: linux/amd64,linux/arm64
                     labels: ${{ steps.meta.outputs.labels }}
                     tags: "${{ steps.meta.outputs.tags }}"
                     cache-from: type=gha, scope=${{ github.workflow }}

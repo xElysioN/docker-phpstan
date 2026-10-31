@@ -39,7 +39,7 @@ Refer to the [PHPStan documentation](https://phpstan.org/user-guide/docker#insta
 
 | Package          | Version |
 |------------------|---------|
-| PHPStan          | 2.3.1 |
-| phpstan-symfony  | 2.1.0 |
-| phpstan-doctrine | 2.0.28 |
+| PHPStan          | 2.3.4 |
+| phpstan-symfony  | 2.1.1 |
+| phpstan-doctrine | 2.1.0 |
 | phpstan-phpunit  | 2.1.1 |

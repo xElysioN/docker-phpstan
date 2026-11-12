@@ -41,5 +41,5 @@ Refer to the [PHPStan documentation](https://phpstan.org/user-guide/docker#insta
 |------------------|---------|
 | PHPStan          | 2.3.5 |
 | phpstan-symfony  | 2.1.1 |
-| phpstan-doctrine | 2.1.0 |
-| phpstan-phpunit  | 2.1.1 |
+| phpstan-doctrine | 2.1.2 |
+| phpstan-phpunit  | 2.1.2 |
